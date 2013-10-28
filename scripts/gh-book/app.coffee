@@ -44,6 +44,9 @@ define [
         allContent.each (book) ->
           book.manifest?.add(model) # Only books have a manifest
 
+  allContent.on 'remove', (model, collection, options) ->
+    epubContainer.removeChild(model)
+
 
   # The WelcomeSignInView is overloaded to show Various Dialogs.
   #
