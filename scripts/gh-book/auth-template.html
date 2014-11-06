@@ -1,4 +1,4 @@
-{{#if hasRepo}}
+<div id="repo-buttons">
   {{#if canCollaborate}}
   <div class="btn-group">
     <button id="save-content" type="button" class="btn {{#if isDirty}}btn-primary{{else}}disabled{{/if}}" data-placement="bottom" data-toggle="tooltip" title="Save all changes in all content (books, chapters, sections)">
@@ -21,6 +21,8 @@
   </button>
   {{/if}}
 
+  <a href="http://{{repoUser}}.github.io/{{repoName}}" target="_blank" data-bypass="true" class="btn">Preview <i class="icon-share"></i></a>
+
   <div class="btn-group">
     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
       <i class="icon-cogs"></i>
@@ -32,11 +34,11 @@
       {{else}}
         <li><a href="" id="sign-in">Sign In</a></li>
       {{/if}}
-      <li><a href="" id="edit-settings">Change Repository</a></li>
       <!-- dropdown menu links -->
+      <li><a href="#edit-repo-modal" data-toggle="modal">Change Bookshelf</a></li>
     </ul>
   </div>
-{{/if}}
+</div>
 
 <!-- Sign in Modal -->
 <div id="sign-in-modal" data-backdrop="false" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="sign-in-modal-label" aria-hidden="true">
@@ -49,15 +51,14 @@
     <p>To be able to save your changes, you must provide us with your
         <a href="http://github.com/">github</a> username and password.</p>
 
-    <p>If you refresh this page you may need to re-enter this information.</p>
-    <div class="form-inline">
-      <input id="github-id" class="input-small" type="text" required="true" placeholder="Username" value="{{id}}"/>
-      <input id="github-password" type="password" required="true" class="input-small" placeholder="Password"/>
-    </div>
-    <p id="login-anonymous"><a data-dismiss="modal">No thanks, I just want to demo the editor</a></p>
+    <p id="login-info-wrapper">If you refresh this page you may need to re-enter this information.</p>
     <div id="login-advanced-wrapper">
-      <a data-toggle="collapse" data-target="#login-advanced"
-        class="login-advanced-toggle">Advanced login options</a>
+      <div class="form-inline">
+        <input id="github-id" class="input-small" type="text" required="true" placeholder="Username" value="{{id}}"/>
+        <input id="github-password" type="password" required="true" class="input-small" placeholder="Password"/>
+        (<a data-toggle="collapse" data-target="#login-advanced"
+          class="login-advanced-toggle">or use advanced login with OAuth Token</a>)
+      </div>
       <div class="collapse" id="login-advanced">
         <p>If you do not want to provide your username and password, you can <a target="_window" href="https://github.com/settings/applications">Create a new OAuth Token</a> and provide it below. You can revoke the token at any point later</p>
         <div class="form">
@@ -66,6 +67,7 @@
         <p><strong>Note:</strong> To save changes on Github you may still need to click <button type="button" class="btn btn-mini" data-target="#settings-modal" data-toggle="modal"><i class="icon-cogs"></i> Settings</button>  and change to a repository you have access to.</p>
       </div>
     </div>
+    <p id="login-anonymous"><a data-dismiss="modal">No thanks, I just want to demo the editor</a></p>
   </div>
   <div class="modal-footer">
     <button id="sign-in-ok" type="submit" class="btn btn-primary">Sign In</button>
@@ -78,7 +80,7 @@
 <div id="fork-book-modal" data-backdrop="false" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="fork-book-modal-label" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="fork-book-modal-label">Copy this book!</h3>
+    <h3 id="fork-book-modal-label">Copy this shelf!</h3>
   </div>
   <h4>&#160; Places I have permission to make changes:</h4>
   <div class="modal-body">
@@ -91,29 +93,91 @@
   </div>
 </div>
 
-
-
-<!-- Edit Settings Modal -->
-<div id="edit-settings-modal" data-backdrop="false" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="edit-settings-modal-label" aria-hidden="true">
+<div id="fork-progress-modal" data-backdrop="false" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="fork-progress-modal-label" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="edit-settings-modal-label">Edit Current Repository Settings!</h3>
+    <h3 id="fork-progress-modal-label">Copying in progress</h3>
   </div>
   <div class="modal-body">
-    <p>To edit a book you must set a repository user and a repository name.</p>
-
-    <div class="form-inline">
-      <input id="repo-user" class="input-small" required="true" type="text" placeholder="Repo User" value="{{repoUser}}"/>
-      <input id="repo-name" class="input-small" required="true" type="text" placeholder="Repo Name" value="{{repoName}}"/>
-    </div>
-    <p>Optionally you can set a branch to use. If it is left blank the default branch will be used.</p>
-    <div class="form">
-      <input id="repo-branch" class="input-small" type="text" placeholder="Optional Branch" value="{{branch}}"/>
-    </div>
+    [Progress indicator here]
   </div>
   <div class="modal-footer">
-    <button id="edit-settings-ok" data-dismiss="modal" type="submit" class="btn btn-primary">Change Book!</button>
     <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+  </div>
+</div>
+
+<div id="fork-redirect-modal" data-backdrop="false" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="fork-redirect-modal-label" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="fork-redirect-modal-label">Existing bookshelf</h3>
+  </div>
+  <div class="modal-body">
+    You already have a copy of this bookshelf.
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    <button class="btn btn-primary">Take me there</button>
+  </div>
+</div>
+
+
+<!-- Edit Repository Modal -->
+<div id="edit-repo-modal" data-backdrop="false" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="edit-repo-modal-label" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="edit-repo-modal-label">Change Bookshelf</h3>
+  </div>
+  <div class="modal-body">
+    <div class="pull-right">
+      <a href="" data-toggle=collapse data-target=#what-are-bookshelves>What are bookshelves?</a>
+    </div>
+    <p class=collapse id=what-are-bookshelves>
+      A bookshelf holds a single book or a set of related books that you want to edit at the same time and with the same co-authors. The books might share content; for instance a textbook student and teacher editions. A bookshelf is created as a repository in GitHub.
+    </p>
+
+    {{#unless repoName}}
+      <p>
+        <a href="" data-select-repo='{"repoUser":"{{defaultRepo.repoUser}}","repoName":"{{defaultRepo.repoName}}"}'>
+          Start with the demo bookshelf
+        </a> 
+        ({{defaultRepo.repoUser}} / {{defaultRepo.repoName}})
+      </p>
+    {{/unless}}
+
+    {{#if repoHistory}}
+      <h5>Go to a recently viewed shelf:</h5>
+
+      {{#each repoHistory}}
+
+        {{#if this.current}}
+          <li><strong>{{this.repoUser}} / {{this.repoName}}</strong> (current)</li>
+        {{/if}}
+        {{#unless this.current}}
+          <li><a href="" data-select-repo='{"repoUser":"{{this.repoUser}}","repoName":"{{this.repoName}}"}'>{{this.repoUser}} / {{this.repoName}}</a></li>
+        {{/unless}}
+
+      {{/each}}
+    {{/if}}
+
+    <h5>View or create another shelf:</h5>
+    <form id="edit-repo-form" action="#" class="form-inline" style="margin: 0 0 15px">
+      <label for="repo-user">Owner ID: </label>
+      <input id="repo-user" class="input-small" required="true" type="text" placeholder="github user id" value="{{repoUser}}"/>
+      <label for="repo-name">Bookshelf ID: </label>
+      <input id="repo-name" class="input-medium" required="true" type="text" placeholder="github repository id" value="{{repoName}}"/>
+      <button type="submit" class="btn btn-primary">Next</button>
+    </form>
+
+    <span class="hide" data-repo-missing>
+      This bookshelf does not exist. Create it?
+      <button class="btn" data-create-repo>Yes, Create New Shelf</button>
+      <button class="btn" data-dismiss="modal">Cancel</button>
+    </span>
+    <span class="hide text-error" data-error-creating>
+      Failed to create bookshelf, are you sure you have access to create it under this owner?
+    </span>
+  </div>
+  <div class="modal-footer">
   </div>
 </div>
 
